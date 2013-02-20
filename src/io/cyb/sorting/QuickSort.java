@@ -21,8 +21,6 @@ public class QuickSort {
 		if (this.strategy == null) strategy = LEFT;
 		
 		partition(0, a.length-1);
-		for (int el : a) System.out.printf("%s ", el); 
-		
 		return a;
 	}
 	
