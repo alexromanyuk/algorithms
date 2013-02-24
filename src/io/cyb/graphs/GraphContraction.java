@@ -1,93 +1,119 @@
 package io.cyb.graphs;
 
-import java.io.BufferedReader;
+import io.cyb.Utility;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 /**
  * @author ARomanyuk
  */
 public class GraphContraction {
-
-	private final int SEED_SIZE = 200;
+	LinkedList<LinkedList<Integer>> adjList;
+	
+	public GraphContraction(LinkedList<LinkedList<Integer>> adjList) {
+		this.adjList = adjList;
+	}
 	
 	/**
 	 * Karger graph contraction algorithm
-	 * @return min cuts
+	 * @return possible # of minCuts
 	 */
-	public int contract(List<Integer[]> adjList) {
+	public int contract() {
+		int[] vu = null;
 		while (adjList.size() > 2) {
-			//FIXME
-		}		
-		return 0;
+			vu = chooseRandomEdge();
+			merge(vu[0], vu[1]);
+		}	
+		//minCut candidate	
+		return adjList.get(0).size() - 1;
 	}
 	
 	/**
+     * TODO: Refactor
 	 * @return vertices v,u 
 	 */
 	private int[] chooseRandomEdge() { 
-		Random rand = new Random(SEED_SIZE);
-		return new int[] {rand.nextInt(), rand.nextInt()};
+		Random rand = new Random();
+		int v = rand.nextInt(adjList.size());
+		
+		//[1..size] get random cell data, then get index of row
+		int u = rand.nextInt(adjList.get(v).size() -1) + 1;
+		u = adjList.get(v).get(u);
+		u = getIndexByTailVertex(u);
+		
+		return new int[] {v, u};
 	}
 
 	/**
-	 * 1. merge v+u
-	 * 2. change all adjacent vertices to point on v (rather than u).
-	 * 3. remove self-loops
-	 * 4. remove u 
+	 * <ul><li>merge v+u</li>
+	 *     <li>change all adjacent vertices to point on v (rather than u).</li>
+	 *     <li>remove self-loops</li>
+	 *     <li>remove u</li> 
+     *
+	 * @param v - row index 
+	 * @param u - row index
+	 * TODO: Refactor
 	 */
-	 void merge(int v, int u, LinkedList<LinkedList<Integer>> adjList) {
+	 void merge(int v, int u) {
+		LinkedList<Integer> adjToV = null;
 		LinkedList<Integer> vVertices = adjList.get(v);
 		LinkedList<Integer> uVertices = adjList.get(u);
 		vVertices.addAll(uVertices);
-				
-		for (Integer vertex : vVertices) {
-			if (vertex == u) vertex = v;
-			removeEdge(v, u, adjList.get(vertex));
+		
+		//Indices to verticies:
+		v = adjList.get(v).get(0);
+		u = adjList.get(u).get(0);
+		
+		int curVertex = -1; 
+		
+		for (int i=1; i<vVertices.size(); i++) {
+			curVertex = vVertices.get(i); 
+			if (curVertex == u || curVertex == v) {
+				// Remove self-loop
+				vVertices.remove(i--);
+			}
+			else {
+				adjToV = adjList.get(getIndexByTailVertex(curVertex));
+				for (int j=1; j < adjToV.size(); j++) {
+					if (adjToV.get(j) == u) {
+						adjToV.set(j, v);
+					}
+				}
+			}
 		}
 		
-		//FIXME remove self-loops
-		vVertices.removeAll(Arrays.asList(new int[]{v}));
-		vVertices.addFirst(v);
-		
-		adjList.remove(u);
+		vVertices.removeAll(Arrays.asList(new int[]{v}));		
+		adjList.remove(getIndexByTailVertex(u));
 	}
-	
-	private void removeEdge(int v, int u, LinkedList<Integer> vertices) {
-		for (Integer vertex : vertices) {
-			if (vertex == u) vertex = v; 
+	 
+	int getIndexByTailVertex(int vertex) {
+		for (int i=0; i<=adjList.size(); i++) {
+			if (adjList.get(i).get(0) == vertex) 
+				return i;
 		}
-	}
-		
-	private static LinkedList<LinkedList<Integer>> readFile(String fileName) throws IOException {
-		LinkedList<LinkedList<Integer>> adjList = new LinkedList<LinkedList<Integer>>();
-		String line = null;
-		
-		File file = new File(fileName);
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		
-		while (null != (line = reader.readLine())) {
-			adjList.add(toList(line));
-		}
-		return adjList;
-	}
-	
-	private static LinkedList<Integer> toList(String line) {
-		LinkedList<Integer> vertices = new LinkedList<Integer>();
-		for (String vertex :line.split("	")) {
-			vertices.add(new Integer(vertex)); 
-		}
-		return vertices;
+		throw new IllegalStateException();
 	}
 	
 	public static void main(String[] args) throws IOException {
 		String path = new File(".").getCanonicalPath();
-		LinkedList<LinkedList<Integer>> adjList = readFile(path+"/data/kargerMinCut.txt");
-		System.out.println();
+		int minCut = Integer.MAX_VALUE;
+		int contractResult = 0;
+
+		// FIXME do deep copy of LL
+		// FIXME move mincut into GraphContraction.minCut()
+		for (int i = 0; i < 100; i++) {
+			LinkedList<LinkedList<Integer>> adjList = Utility.readAdjacencyList(
+					path + "/data/kargerMinCut.txt");
+
+			GraphContraction gc = new GraphContraction(adjList);
+			contractResult = gc.contract();
+			if (minCut > contractResult) {
+				minCut = contractResult;
+			}
+		}
+		System.out.println("MinCut = "+minCut);
 	}
 }
