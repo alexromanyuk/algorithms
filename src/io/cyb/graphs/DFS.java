@@ -2,6 +2,7 @@ package io.cyb.graphs;
 
 import java.util.ArrayList;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.linked.TIntLinkedList;
 import gnu.trove.stack.array.TIntArrayStack;
 
@@ -12,19 +13,19 @@ public class DFS {
 	 *     so we could mark it as explored. 
 	 *  2. row number in ArrayList is also Vertex number
 	 */
-	private ArrayList<TIntLinkedList> graph;
+	private ArrayList<TIntArrayList> graph;
 	private int finTimes;
 	private int leader;
 	
 	private TIntArrayStack stack = new TIntArrayStack();
 	
-	public DFS(ArrayList<TIntLinkedList> graph) {
+	public DFS(ArrayList<TIntArrayList> graph) {
 		this.graph = graph;
 	}
 	
 	public void search(int s) {
 		
-		TIntLinkedList vertices = adjacentTo(s);
+		TIntArrayList vertices = adjacentTo(s);
 		markExploredVertex(s);		
 		int v = 0;
 		
@@ -32,6 +33,7 @@ public class DFS {
 			for (int i = 1; i < vertices.size(); i++) {
 				v = vertices.get(i);
 				if (isUnexplored(v)) {
+				//FIXME: how to properly backtrack?
 					markExploredEdge(s, v);
 					search(v);
 				}				
@@ -49,18 +51,24 @@ public class DFS {
 	}
 	
 	private void markExploredEdge(int s, int v) {
-		graph.get(s).set(v, v * (-1));
+		int i = edgeVertexToIndex(s, v);
+		graph.get(s).set(i, v * (-1));
 	}
 	
 	private boolean isUnexplored(int v) {
-		return (v > 0);
+		return (v > 0) && (graph.get(v).get(0) > 0);
 	}
 	
 	private int backtrack() {
 		return stack.pop();
 	}
 	
-	private TIntLinkedList adjacentTo(int s) {
+	//FIXME: Trove indexOf bug? 
+	private int edgeVertexToIndex(int s, int v) {
+		return graph.get(Math.abs(s)).indexOf(v);
+	}
+	
+	private TIntArrayList adjacentTo(int s) {
 		return graph.get(s);
 	}
 	
