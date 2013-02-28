@@ -1,5 +1,6 @@
 package io.cyb.graphs;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.linked.TIntLinkedList;
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,13 +18,13 @@ public class SCCTest {
 	private final boolean FORWARD = false;
 	
 	@Test(dataProvider = "testData")
-	public void testSCC(ArrayList<TIntLinkedList> graph, 
-			ArrayList<TIntLinkedList> graphRev, int[] sccs) {
+	public void testSCC(ArrayList<TIntArrayList> graph, 
+			ArrayList<TIntArrayList> graphRev, int[] sccs) {
 		DFS dfs = new DFS(graph);
 		dfs.search(1);
 	}
 	
-	@DataProvider(name = "testData")
+	@DataProvider(name = "testData", parallel=false)
 	private Object[][] readTestData() throws IOException {
 		File path = new File(".");
 		File data = new File(path.getCanonicalPath()+"/data/sccTestData.txt");
@@ -58,15 +59,20 @@ public class SCCTest {
 			res[i][2] = scc;
 		}
 		
-		return res;	
+//		return res;
+//     debugging on test#1 data
+		Object[][] val = new Object[1][3];
+		val[0] = res[0];
+		return val;
 	}
 	
 	//TODO change reversed read to Topological Sort?
-	private ArrayList<TIntLinkedList> strToAdjList(String data, boolean isReversed) {
+	//FIXME TIntLinkedList.indexOf is broken, use TIntArrayList  
+	private ArrayList<TIntArrayList> strToAdjList(String data, boolean isReversed) {
 		String[] rows = data.split("\n");
 		String[] cel = new String[2];
 		int tail, head = 0;
-		ArrayList<TIntLinkedList> list = new ArrayList<TIntLinkedList>(rows.length);
+		ArrayList<TIntArrayList> list = new ArrayList<TIntArrayList>(rows.length);
 		//FIXME init arrays size
 		for (int i = 0; i < rows.length; i++) {
 			list.add(null);
@@ -80,7 +86,8 @@ public class SCCTest {
 			head = isReversed ? Integer.parseInt(cel[0]) : Integer.parseInt(cel[1]);
 			
 			if (null == list.get(tail)) {
-				list.set(tail, new TIntLinkedList());
+				list.set(tail, new TIntArrayList());
+				list.get(tail).add(tail);
 			} 
 			list.get(tail).add(head);
 		}
