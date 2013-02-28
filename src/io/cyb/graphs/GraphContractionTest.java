@@ -3,8 +3,8 @@ package io.cyb.graphs;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 //TODO: rewrite to testng with dataprovider
 public class GraphContractionTest {
@@ -29,14 +29,14 @@ public class GraphContractionTest {
 		GraphContraction gc = new GraphContraction(adjList);
 		gc.merge(gc.getIndexByTailVertex(1), gc.getIndexByTailVertex(2));
 		Assert.assertEquals(3, adjList.size());
-		Assert.assertArrayEquals(expected1.get(0).toArray(), adjList.get(0).toArray());
-		Assert.assertArrayEquals(expected1.get(1).toArray(), adjList.get(1).toArray());
-		Assert.assertArrayEquals(expected1.get(2).toArray(), adjList.get(2).toArray());
+		Assert.assertEquals(expected1.get(0).toArray(), adjList.get(0).toArray());
+		Assert.assertEquals(expected1.get(1).toArray(), adjList.get(1).toArray());
+		Assert.assertEquals(expected1.get(2).toArray(), adjList.get(2).toArray());
 		
 		gc.merge(gc.getIndexByTailVertex(1), gc.getIndexByTailVertex(4));
 		Assert.assertEquals(2, adjList.size());
-		Assert.assertArrayEquals(expected2.get(0).toArray(), adjList.get(0).toArray());
-		Assert.assertArrayEquals(expected2.get(1).toArray(), adjList.get(1).toArray());
+		Assert.assertEquals(expected2.get(0).toArray(), adjList.get(0).toArray());
+		Assert.assertEquals(expected2.get(1).toArray(), adjList.get(1).toArray());
 	}
 	
 	@Test
