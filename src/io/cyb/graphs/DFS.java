@@ -32,11 +32,22 @@ public class DFS {
 		while (stack.size() > 0) {
 			for (int i = 1; i < vertices.size(); i++) {
 				v = vertices.get(i);
+				markExploredEdge(s, v);
 				if (isUnexplored(v)) {
-				//FIXME: how to properly backtrack?
-					markExploredEdge(s, v);
 					search(v);
-				}				
+				} else {
+					backtrack();
+				}
+			}
+		}
+		
+		System.out.println("fin time: "+finTimes);
+	}
+	
+	public void dfsLoop() {
+		for (int s = graph.size()-1; s >= 1; s--) {
+			if (isUnexplored(s)) {
+				search(s);
 			}
 		}
 	}
@@ -59,8 +70,11 @@ public class DFS {
 		return (v > 0) && (graph.get(v).get(0) > 0);
 	}
 	
+	//FIXME: Trove stack bug?
 	private int backtrack() {
-		return stack.pop();
+		finTimes++;
+		
+		return stack.size() > 0? stack.pop() : -1;
 	}
 	
 	//FIXME: Trove indexOf bug? 

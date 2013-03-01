@@ -21,6 +21,7 @@ public class SCCTest {
 	public void testSCC(ArrayList<TIntArrayList> graph, 
 			ArrayList<TIntArrayList> graphRev, int[] sccs) {
 		DFS dfs = new DFS(graph);
+//		dfs.dfsLoop();
 		dfs.search(1);
 	}
 	
