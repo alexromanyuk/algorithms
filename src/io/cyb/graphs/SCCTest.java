@@ -20,10 +20,17 @@ public class SCCTest {
 	@Test(dataProvider = "testData")
 	public void testSCC(ArrayList<TIntArrayList> graph, 
 			ArrayList<TIntArrayList> graphRev, int[] sccs) {
-		DFS dfs = new DFS(graph);
-//		dfs.dfsLoop();
-		dfs.search(1);
+		DFS dfs = new DFS();
+		dfs.dfsLoop(graph, graphRev);
+//		dfs.search(1);
+//		dfs.labelsToFinishTimes();
 	}
+	
+	@Test
+	public void testFinishingTimes() {}
+	
+	@Test
+	public void testLeaders() {}
 	
 	@DataProvider(name = "testData", parallel=false)
 	private Object[][] readTestData() throws IOException {

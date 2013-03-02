@@ -2,6 +2,7 @@ package io.cyb.graphs;
 
 /**
  * Strongly connected components
+ * Kosaraju's two-pass algorithm 
  * 
  * @author ARomanyuk
  */
