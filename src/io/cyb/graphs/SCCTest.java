@@ -20,8 +20,8 @@ public class SCCTest {
 	@Test(dataProvider = "testData")
 	public void testSCC(ArrayList<TIntArrayList> graph, 
 			ArrayList<TIntArrayList> graphRev, int[] sccs) {
-		DFS dfs = new DFS();
-		dfs.dfsLoop(graph, graphRev);
+		DFS dfs = new DFS(graph, graphRev);
+		dfs.dfsLoop();
 //		dfs.search(1);
 //		dfs.labelsToFinishTimes();
 	}

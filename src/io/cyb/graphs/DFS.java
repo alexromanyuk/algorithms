@@ -1,10 +1,6 @@
 package io.cyb.graphs;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-
-import javax.print.attribute.standard.Finishings;
-
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.linked.TIntLinkedList;
 
@@ -16,12 +12,20 @@ public class DFS {
 	 *  2. row number in ArrayList is also Vertex number
 	 */
 	private ArrayList<TIntArrayList> graph;
+	private ArrayList<TIntArrayList> graphRev;
+	private ArrayList<TIntArrayList> current;
+	
 	private TIntLinkedList finTimes = new TIntLinkedList();
 	private TIntLinkedList leaders = new TIntLinkedList();
 	private int finTime;
 	private int leader;
 	
-	public DFS() {
+	public DFS(ArrayList<TIntArrayList> graph, ArrayList<TIntArrayList> graphRev) {
+		this.graph = graph;
+		this.graphRev = graphRev;
+
+		this.current = graphRev;
+		
 		for (int i = 0; i< graph.size(); i++) {
 			finTimes.add(0);
 			leaders.add(0);
@@ -29,9 +33,7 @@ public class DFS {
 	}
 	
 	//FIXME: leaders
-	public void search(ArrayList<TIntArrayList> graph, int i) {
-		this.graph = graph;
-		
+	public void search(int i) {
 		
 		TIntArrayList vertices = adjacentTo(i);
 		markExploredVertex(i);		
@@ -42,20 +44,29 @@ public class DFS {
 			markExploredEdge(i, v);
 			setLeaderFor(j);
 			if (isUnexplored(v)) {
-				search(graph, v);
+				search(v);
 			}
 		}
 		
 		setFinishTimeFor(i);
 	}
 	
-	public void dfsLoop(ArrayList<TIntArrayList> graph, ArrayList<TIntArrayList> graphReverse) {
-		for (int s = graph.size()-1; s >= 1; s--) {
+	public void dfsLoop() {
+		for (int s = current.size()-1; s >= 1; s--) {
 			if (isUnexplored(s)) {
 				leader = s;
-				search(graph, s);
+				search(s);
 			}
 		}
+		
+		convertGraph();
+		for (int s = current.size()-1; s >= 1; s--) {
+			if (isUnexplored(s)) {
+				leader = s;
+				search(s);
+			}
+		}
+		System.out.println();
 	}
 	
 	/** 
@@ -63,20 +74,45 @@ public class DFS {
 	 *  2. push into stack
 	 */
 	private void markExploredVertex(int s) {
-		graph.get(s).set(0, s * (-1));
+		current.get(s).set(0, s * (-1));
 	}
 	
 	private void markExploredEdge(int s, int v) {
 		int i = edgeVertexToIndex(s, v);
-		graph.get(s).set(i, v * (-1));
+		current.get(s).set(i, v * (-1));
 	}
 	
 	private boolean isUnexplored(int v) {
-		return (v > 0) && (graph.get(v).get(0) > 0);
+		return (v > 0) && (current.get(v).get(0) > 0);
 	}
 	
-	private int convertLabelToFinishTime(int label) {
-		return finTimes.get(label);
+	private void convertGraph() {
+		ArrayList<TIntArrayList> converted = new ArrayList<TIntArrayList>();
+		TIntArrayList vertices = null;
+		int head = 0;
+		int tail = 0;
+		
+		for (int j = 1; j <= graph.size(); j++) {
+			converted.add(new TIntArrayList());
+		}
+		
+		for (int i = 1; i < graph.size(); i++) {
+			vertices = graph.get(i);
+			tail = convLabelToFinTime(i);
+			converted.get(tail).add(tail);
+			
+			for (int j = 1; j < vertices.size(); j++) {
+				head = vertices.get(j);
+				head = convLabelToFinTime(head);
+				converted.get(tail).add(head);
+			}
+		}
+		
+		current = converted;
+	}
+	
+	private int convLabelToFinTime(int label) {
+		return finTimes.get(Math.abs(label));
 	}
 	
 	//FIXME: Trove stack bug?
@@ -86,11 +122,11 @@ public class DFS {
 	
 	//FIXME: Trove indexOf bug? 
 	private int edgeVertexToIndex(int s, int v) {
-		return graph.get(Math.abs(s)).indexOf(v);
+		return current.get(Math.abs(s)).indexOf(v);
 	}
 	
 	private TIntArrayList adjacentTo(int s) {
-		return graph.get(s);
+		return current.get(s);
 	}
 	
 	private void setLeaderFor(int i) {
