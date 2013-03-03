@@ -32,17 +32,16 @@ public class DFS {
 		}
 	}
 	
-	//FIXME: leaders
 	public void search(int i) {
 		
 		TIntArrayList vertices = adjacentTo(i);
-		markExploredVertex(i);		
+		markExploredVertex(i);
+		setLeaderFor(i);
 		int v = 0;
-
+		
 		for (int j = 1; j < vertices.size(); j++) {
 			v = vertices.get(j);
 			markExploredEdge(i, v);
-			setLeaderFor(j);
 			if (isUnexplored(v)) {
 				search(v);
 			}
@@ -66,7 +65,6 @@ public class DFS {
 				search(s);
 			}
 		}
-		System.out.println();
 	}
 	
 	/** 
