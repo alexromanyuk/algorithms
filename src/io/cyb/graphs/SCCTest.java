@@ -1,7 +1,6 @@
 package io.cyb.graphs;
 
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.linked.TIntLinkedList;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -22,8 +21,6 @@ public class SCCTest {
 			ArrayList<TIntArrayList> graphRev, int[] sccs) {
 		DFS dfs = new DFS(graph, graphRev);
 		dfs.dfsLoop();
-//		dfs.search(1);
-//		dfs.labelsToFinishTimes();
 	}
 	
 	@Test
@@ -75,7 +72,6 @@ public class SCCTest {
 	}
 	
 	//TODO change reversed read to Topological Sort?
-	//FIXME TIntLinkedList.indexOf is broken, use TIntArrayList  
 	private ArrayList<TIntArrayList> strToAdjList(String data, boolean isReversed) {
 		String[] rows = data.split("\n");
 		String[] cel = new String[2];

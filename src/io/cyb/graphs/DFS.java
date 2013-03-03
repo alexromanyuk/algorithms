@@ -1,6 +1,10 @@
 package io.cyb.graphs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.linked.TIntLinkedList;
 
@@ -12,8 +16,8 @@ public class DFS {
 	 *  2. row number in ArrayList is also Vertex number
 	 */
 	private ArrayList<TIntArrayList> graph;
-	private ArrayList<TIntArrayList> graphRev;
 	private ArrayList<TIntArrayList> current;
+	private Map<Integer, Integer> result = new HashMap<Integer, Integer>();
 	
 	private TIntLinkedList finTimes = new TIntLinkedList();
 	private TIntLinkedList leaders = new TIntLinkedList();
@@ -22,8 +26,6 @@ public class DFS {
 	
 	public DFS(ArrayList<TIntArrayList> graph, ArrayList<TIntArrayList> graphRev) {
 		this.graph = graph;
-		this.graphRev = graphRev;
-
 		this.current = graphRev;
 		
 		for (int i = 0; i< graph.size(); i++) {
@@ -65,6 +67,19 @@ public class DFS {
 				search(s);
 			}
 		}
+		
+		countSizeOfBiggestSCC();
+	}
+	
+	private void countSizeOfBiggestSCC() {
+		int count = 0;
+		for (int i = 1; i < leaders.size(); i++) {
+			count = result.get(leaders.get(i)) == null? 1 : result.get(leaders.get(i)) + 1;
+			result.put(leaders.get(i), count);
+		}
+		
+		Object[] arr = result.values().toArray();
+		Arrays.sort(arr);
 	}
 	
 	/** 
