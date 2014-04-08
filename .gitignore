@@ -4,3 +4,6 @@ lib
 .classpath
 .project
 test-output
+.idea
+*.iml
+out
